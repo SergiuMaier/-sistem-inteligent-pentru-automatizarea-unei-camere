@@ -1,3 +1,9 @@
+/*
+ * - Sistem inteligent pentru automatizarea unei camere -
+ * 
+ *   Autori: Papuc Adrian, Raț Alin, Maier Sergiu
+*/
+
 #include <LiquidCrystal.h>
 #define ADC_VREF_TYPE ((0 << REFS1) | (0 << REFS0) | (0 << ADLAR))
 
