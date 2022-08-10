@@ -1,0 +1,1 @@
+# -sistem-inteligent-pentru-automatizarea-unei-camere
