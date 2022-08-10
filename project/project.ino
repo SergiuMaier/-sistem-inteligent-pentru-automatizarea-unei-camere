@@ -33,7 +33,7 @@ void setup() {
 
   //TIMER0
   TCCR0A = (1 << WGM01) | (0 << WGM00);//selectam valoarea de TOP in OCR0A simodul de operare CTC
-  TCNT0=0;//registru ptr valoare acumulata
+  TCNT0 = 0;//registru ptr valoare acumulata
   OCR0A = 20;//valoare de top; intrerupere la 10 microsecunde
   TCCR0B = (0 << WGM02);//pereche cu TCCR0A
   TCCR0B = (0 << CS02) | (1 << CS01) | (0 << CS00);//selectare prescalar
@@ -41,18 +41,18 @@ void setup() {
   TIMSK0 |= B00000010;//(1 << OCIE0A); permite intrerupere
 
   //TIMER1 pentru servomotor, pulsuri PWM
-  TCCR1A=0;
-  TCCR1B=0;
-  TCNT1=0;
-  TCCR1A=0b10100010;
-  TCCR1B=0b00010010;
-  ICR1=20000;
-  OCR1A=580;
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1 = 0;
+  TCCR1A = 0b10100010;
+  TCCR1B = 0b00010010;
+  ICR1 = 20000;
+  OCR1A = 580;
 
   //INTRERUPERE EXTERNA pentru intrarea de la senzorul ultrasonic
-  EICRA |=(0 << ISC11 ) | (1<< ISC10 ) | (0 << ISC01 ) | (1 << ISC00 );  
-  EIMSK |=(0 << INT1 ) | (1 << INT0 ) ;
-  EIFR |=(0 << INTF1 ) | (0 << INTF0 ) ;
+  EICRA |= (0 << ISC11 ) | (1<< ISC10 ) | (0 << ISC01 ) | (1 << ISC00 );  
+  EIMSK |= (0 << INT1 ) | (1 << INT0 ) ;
+  EIFR |= (0 << INTF1 ) | (0 << INTF0 ) ;
   
   initializareADC();
   SREG |= (1 << SREG_I);//activare intr. globale
@@ -87,17 +87,20 @@ ISR ( INT0_vect )  //intr. externa ptr masurarea duratei pulsului la ultrasonic
 {
   SREG &= ~(1 << SREG_I ) ; 
   static unsigned long startTime;
+  
   if ( PIND & B00000100 )
   { 
     startTime = timp; //primul front al semnalului 
   } 
   else //al doilea front
   {  
-    LastPulseTime = timp - startTime;//calculare timp intre cele doua fronturi 
+    LastPulseTime = timp - startTime; //calculare timp intre cele doua fronturi 
     timp=0;//resetare contor ultrasonic
   } 
+  
   valoareSenzor = citesteADC(0);//citirea val analogice ptr temperatura
   temperatura = (valoareSenzor/1024.0)*4.9*35.75-50;  //calculare temperatura in grade Celsius
+  
   SREG |= (1 << SREG_I ) ; 
 }
 
@@ -120,23 +123,23 @@ void initializareADC()
 {
   DIDR0 = (0<<ADC5D) | (0 << ADC4D) | (0 << ADC3D) | (0 << ADC2D) | (0 << ADC1D) | (0 << ADC0D); //dezactivare buffer de intrare digitala
   ADMUX = ADC_VREF_TYPE;//configurare multiplexor adc
-  
   ADCSRA = (1 << ADEN) | (0 << ADSC) | (1 << ADATE) | (0 << ADIF) | (0 << ADIE) | (1 << ADPS2) | (0 << ADPS1) | (0 << ADPS0);//registru de control si stare
-  
 }
 
 void loop() { 
+  
   lcd.setCursor(0, 0);
   lcd.print("T=");
   lcd.setCursor(9, 1);
   lcd.print("Sec=");
   lcd.setCursor(13, 1);
   lcd.print(secunde);
+  
   if(afisat1data==0)
   {
-  lcd.setCursor(2,0);
-  lcd.print(temperatura);
-  ++afisat1data;
+    lcd.setCursor(2,0);
+    lcd.print(temperatura);
+    ++afisat1data;
   }
 
   if (PINB & B00000001) {//verificare semnal de la PIR(pin 8)
@@ -145,10 +148,7 @@ void loop() {
     lcd.setCursor(13,0);
     lcd.print("ON ");
   }
-  else
-  {
-    
-  }
+  else{}
    
   if  ((secunde - contorLed) >= 5) {//perioada led aprins in sec
     PORTD &= B10111111;//stingere led (pin 6)
@@ -158,17 +158,18 @@ void loop() {
  
   if(flag1>=10)//initializare pin trig pentru ultrasonic
   {
-  PORTB &= B11011111;//semnal 0 pe pinul trig
+    PORTB &= B11011111;//semnal 0 pe pinul trig
   }
   
   if(flag1>=100)//delay trig
   {
-  PORTB |= B00100000;//valoare 1 pe pinul trig
+    PORTB |= B00100000;//valoare 1 pe pinul trig
   }
+  
   if(flag1>=200)//delay
   {
-  PORTB &= B11011111;//dezactivare pin trig
-  flag1=0;//resetare delay ultrasonic
+    PORTB &= B11011111;//dezactivare pin trig
+    flag1=0;//resetare delay ultrasonic
   }
 
   distance_cm = LastPulseTime*10;//compensez ptr intreruperea de 10 microsecunde
@@ -176,35 +177,37 @@ void loop() {
   distance_cm=distance_cm*0.5;// masurat timp ptr dus-intors
   lcd.setCursor(0, 1);
   lcd.print("d=");
-    if(distance_cm<10)
+    
+  if(distance_cm<10)
+  {
+    OCR1A=1550;//deschidere usa prin setare valoare de top timer1 
+    contorUsa=secunde;//start contor pentru timpul in care usa e deschisa
+  }
+  
+  if((temperatura<25)&&(secunde-contorUsa>=5))//conditie de temperatura& contor ptr usa deschisa
+  {
+    OCR1A=580;//inchidere usa
+  }
+  
+  if(flag2>100000)//afisare o data pe secunda
+  {
+    if(distance_cm<=400)
     {
-      OCR1A=1550;//deschidere usa prin setare valoare de top timer1 
-      contorUsa=secunde;//start contor pentru timpul in care usa e deschisa
+      lcd.setCursor(2,1);
+      lcd.print(distance_cm);
     }
-    if((temperatura<25)&&(secunde-contorUsa>=5))//conditie de temperatura& contor ptr usa deschisa
+    lcd.setCursor(9,0);
+    lcd.print("LED:");
+         
+    ++flag3;
+    flag2=0;
+    
+    if(flag3>=3)//afisare o data la 3 sec
     {
-      OCR1A=580;//inchidere usa
-    }
-      if(flag2>100000)//afisare o data pe secunda
-      {
-        
-        if(distance_cm<=400)
-        {
-        lcd.setCursor(2,1);
-        lcd.print(distance_cm);
-        }
-        lcd.setCursor(9,0);
-        lcd.print("LED:");
-        //lcd.setCursor(2,0);
-        //lcd.print(temperatura);
-        ++flag3;
-        flag2=0;
-        if(flag3>=3)//afisare o data la 3 sec
-        {
-          lcd.setCursor(2,0);
-          lcd.print(temperatura);
-          flag3=0;
-        }    
-      }
+       lcd.setCursor(2,0);
+       lcd.print(temperatura);
+       flag3=0;
+       }    
+     }
   //lcd.clear();
 }
