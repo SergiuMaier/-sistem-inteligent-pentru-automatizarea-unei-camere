@@ -28,8 +28,8 @@ void setup() {
   lcd.begin(16, 2); 
 
   PORTD = B00000000;
-  DDRB |=B00110010;
-  DDRD &=B01111011;
+  DDRB |= B00110010;
+  DDRD &= B01111011;
 
   //TIMER0
   TCCR0A = (1 << WGM01) | (0 << WGM00);//selectam valoarea de TOP in OCR0A simodul de operare CTC
@@ -103,7 +103,6 @@ ISR ( INT0_vect )  //intr. externa ptr masurarea duratei pulsului la ultrasonic
   
   SREG |= (1 << SREG_I ) ; 
 }
-
 
 unsigned int citesteADC(unsigned char adc_input)
 {
