@@ -1,6 +1,6 @@
 ## Sistem inteligent pentru automatizarea unei camere
 
-Sistemul este bazat pe un modul Arduino Uno și următorii senzori:
+💡 Sistemul este bazat pe un modul Arduino Uno și următorii senzori:
 
 - Senzor cu ultrasunete pentru deschiderea ușii
 - Senzor de prezenta (PIR) pentru aprinderea luminii
