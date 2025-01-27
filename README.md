@@ -1,9 +1,19 @@
-## Sistem inteligent pentru automatizarea unei camere
+# Intelligent Room Automation System
 
-💡 Sistemul este bazat pe un modul Arduino Uno și următorii senzori:
+💡 The system is based on an Arduino Uno module and the following sensors:
 
-- Senzor cu ultrasunete pentru deschiderea ușii
-- Senzor de prezenta (PIR) pentru aprinderea luminii
-- Senzor de temperatura (TMP 36) pentru determinarea temperaturii
+- **Ultrasonic sensor** for door opening  
+- **PIR motion sensor** for turning on the light  
+- **TMP 36 temperature sensor** for measuring temperature  
 
-În situația în care senzorul de prezență sesizează o mișcare în aria sa de acoperire, va genera aprinderea becului. Dacă distanța față de senzorul de temperatură scade sub 50cm se va deschide o ușa (este comandat un servomotor, care se va deplasa în intervalul 0-90 grade). La fiecare 30 de secunde se monitorizeaza temperatura. Dacă temperatura scade sub 25 de grade se închide ușa (dacă nu e deja închisă) prin comanda aceluiași servomotor. Toate informațiile despre senzori sunt afișate pe un LCD.
+---
+
+### Functionality
+
+- When the **PIR motion sensor** detects movement within its coverage area, it triggers the light to turn on.  
+- If the distance to the **ultrasonic sensor** decreases below 50 cm, a door is opened by controlling a servo motor, which moves within a range of 0-90 degrees.  
+- Every **30 seconds**, the system monitors the temperature:  
+  - If the temperature drops below **25°C**, the door is closed (if it isn’t already) by commanding the same servo motor.  
+
+All sensor data is displayed on an **LCD screen**.  
+
